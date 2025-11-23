@@ -1,35 +1,43 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Stack, Slot, router } from "expo-router";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  BackHandler,
+  Platform,
+} from "react-native";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function TabsLayout() {
+  const handleExit = () => {
+    if (Platform.OS === "android") {
+      BackHandler.exitApp();
+    } else {
+      router.replace("/login");
+    }
+  };
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+    <View style={{ flex: 1 }}>
+      <Slot />
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          padding: 16,
+          borderTopWidth: 1,
+          borderColor: "#ddd",
+          backgroundColor: "white",
         }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={{ fontSize: 18 }}>← Назад</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleExit}>
+          <Text style={{ fontSize: 18, color: "red" }}>Выйти</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
