@@ -27,6 +27,15 @@ export interface EvaluationResponse {
   model_answer: string;
   evaluation: {
     semantic_similarity: number;
+    grammar_evaluation: {
+      grammar_score: number;
+      error_count: number;
+      errors: {
+        message: string;
+        error: string;
+        suggestions: string[];
+      }[];
+    };
     llm_evaluation: {
       score: string;
       semantic_similarity: number;

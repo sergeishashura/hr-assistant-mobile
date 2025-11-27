@@ -130,6 +130,7 @@ const chatsSlice = createSlice({
     builder.addCase(answerChat.fulfilled, (state, action) => {
       state.modelAnswer.loading = false;
       state.modelAnswer.item = action.payload;
+      state.question.item = null;
     });
     builder.addCase(answerChat.rejected, (state, action) => {
       state.modelAnswer.loading = false;

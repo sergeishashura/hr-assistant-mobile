@@ -11,6 +11,7 @@ import {
 import { apiClient } from "@/src/utils";
 import { ROLES } from "@/src/constans/roles";
 import { chatsActions } from "./chatsSlice";
+import { buildHrMessage } from "@/src/utils/buildMessage";
 
 export const getAllChats = createAsyncThunk<
   Chat[],
@@ -22,7 +23,6 @@ export const getAllChats = createAsyncThunk<
 
     return data;
   } catch (err: any) {
-    console.log(err.response);
     return rejectWithValue(
       err.response?.data || {
         message: err.message,
@@ -58,8 +58,9 @@ export const getChatDetails = createAsyncThunk<
   { rejectValue: ResponseError }
 >("chats/getChatDetails", async ({ ID }, { rejectWithValue }) => {
   try {
-    const res = await apiClient.post<Chat>(`${CHAT_URL}/${ID}`);
-    return res.data;
+    const { data } = await apiClient.get<Chat>(`${CHAT_URL}/${ID}`);
+
+    return data;
   } catch (err: any) {
     return rejectWithValue(
       err.response?.data || {
@@ -160,7 +161,7 @@ export const answerChat = createAsyncThunk<
       dispatch(
         chatsActions.addMessage({
           role: ROLES.SYSTEM,
-          text: data.evaluation.llm_evaluation.final_comment,
+          text: buildHrMessage(data),
           id: data.id,
         })
       );

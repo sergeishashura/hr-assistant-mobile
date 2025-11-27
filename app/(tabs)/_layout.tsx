@@ -1,4 +1,4 @@
-import { Stack, Slot, router } from "expo-router";
+import { Slot, router, usePathname } from "expo-router";
 import {
   View,
   TouchableOpacity,
@@ -6,8 +6,14 @@ import {
   BackHandler,
   Platform,
 } from "react-native";
+import { useTheme } from "react-native-paper";
 
 export default function TabsLayout() {
+  const theme = useTheme();
+  const pathname = usePathname();
+
+  const isChatsScreen = pathname === "/chats";
+
   const handleExit = () => {
     if (Platform.OS === "android") {
       BackHandler.exitApp();
@@ -17,25 +23,53 @@ export default function TabsLayout() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: theme.colors.background,
+      }}
+    >
       <Slot />
 
       <View
         style={{
           flexDirection: "row",
-          justifyContent: "space-between",
+          justifyContent: isChatsScreen ? "flex-end" : "space-between",
           padding: 16,
           borderTopWidth: 1,
-          borderColor: "#ddd",
-          backgroundColor: "white",
+          borderColor: theme.colors.surfaceVariant,
+          backgroundColor: theme.colors.surface,
         }}
       >
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={{ fontSize: 18 }}>← Назад</Text>
-        </TouchableOpacity>
+        {!isChatsScreen && (
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={{ paddingVertical: 4, paddingHorizontal: 8 }}
+          >
+            <Text
+              style={{
+                fontSize: 18,
+                color: theme.colors.onSurface,
+              }}
+            >
+              ← Back
+            </Text>
+          </TouchableOpacity>
+        )}
 
-        <TouchableOpacity onPress={handleExit}>
-          <Text style={{ fontSize: 18, color: "red" }}>Выйти</Text>
+        <TouchableOpacity
+          onPress={handleExit}
+          style={{ paddingVertical: 4, paddingHorizontal: 8 }}
+        >
+          <Text
+            style={{
+              fontSize: 18,
+              color: theme.colors.error,
+              fontWeight: "600",
+            }}
+          >
+            Exit
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

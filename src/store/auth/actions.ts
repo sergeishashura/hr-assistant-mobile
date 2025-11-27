@@ -12,8 +12,6 @@ export const login = createAsyncThunk<
   { rejectValue: ResponseError }
 >("auth/login", async ({ username, password }, { rejectWithValue }) => {
   try {
-    console.log(username);
-
     const response = await apiClient.post<LoginResponse>(LOGIN_URL, {
       username,
       password,
@@ -26,7 +24,6 @@ export const login = createAsyncThunk<
 
     return response.data;
   } catch (err: any) {
-    console.log(err.response);
     return rejectWithValue(
       err.response?.data || {
         message: err.message,

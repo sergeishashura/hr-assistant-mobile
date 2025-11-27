@@ -1,17 +1,25 @@
 import { router } from "expo-router";
-import { Text } from "react-native";
 import { useEffect, useState } from "react";
-import { FlatList, TouchableOpacity, View } from "react-native";
-import { Button, Modal, Portal, TextInput } from "react-native-paper";
+import { FlatList, Pressable, View } from "react-native";
+import {
+  Button,
+  Modal,
+  Portal,
+  TextInput,
+  Text,
+  useTheme,
+} from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
 import { createChat, getAllChats } from "@/src/store/chats/actions";
 import { chatsSelectors } from "@/src/store/chats/chatsSlice";
 import { formatUnix } from "@/src/utils";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ChatsScreen() {
   const dispatch = useAppDispatch();
+  const theme = useTheme();
+
   const { chats } = useAppSelector(chatsSelectors.getSlice);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -32,19 +40,32 @@ export default function ChatsScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={{ flex: 1, padding: 16, backgroundColor: "white" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <View style={{ flex: 1, padding: 16 }}>
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            marginBottom: 16,
+            marginBottom: 20,
+            alignItems: "center",
           }}
         >
-          <Text style={{ fontSize: 28, fontWeight: "700" }}>Чаты</Text>
+          <Text
+            variant="headlineMedium"
+            style={{
+              color: theme.colors.onBackground,
+              fontWeight: "700",
+            }}
+          >
+            Chats
+          </Text>
 
-          <Button mode="contained" onPress={() => setModalVisible(true)}>
-            + Новый
+          <Button
+            mode="contained"
+            onPress={() => setModalVisible(true)}
+            style={{ borderRadius: 6 }}
+          >
+            + chat
           </Button>
         </View>
 
@@ -53,14 +74,21 @@ export default function ChatsScreen() {
           keyExtractor={(item) => item.id.toString()}
           refreshing={chats.loading}
           onRefresh={() => dispatch(getAllChats())}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => router.push(`/chat/${item.id}`)}
+          ItemSeparatorComponent={() => (
+            <View
               style={{
-                paddingVertical: 14,
-                borderBottomWidth: 1,
-                borderColor: "#eee",
+                height: 1,
+                backgroundColor: theme.colors.surfaceVariant,
               }}
+            />
+          )}
+          renderItem={({ item }) => (
+            <Pressable
+              onPress={() => router.push(`/chat/${item.id}`)}
+              style={({ pressed }) => ({
+                paddingVertical: 14,
+                opacity: pressed ? 0.6 : 1,
+              })}
             >
               <View
                 style={{
@@ -68,20 +96,23 @@ export default function ChatsScreen() {
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={{ fontSize: 18 }}>
-                  {item.title || "Без названия"}
+                <Text
+                  variant="titleMedium"
+                  style={{ color: theme.colors.onBackground }}
+                >
+                  {item.title || "empty"}
                 </Text>
 
                 <View style={{ alignItems: "flex-end" }}>
-                  <Text style={{ fontSize: 12, color: "#777" }}>
-                    создан: {formatUnix(item.created_at)}
-                  </Text>
-                  <Text style={{ fontSize: 12, color: "#777" }}>
-                    обновлён: {formatUnix(item.updated_at)}
+                  <Text
+                    variant="bodySmall"
+                    style={{ color: theme.colors.onSurfaceVariant }}
+                  >
+                    {formatUnix(item.updated_at)}
                   </Text>
                 </View>
               </View>
-            </TouchableOpacity>
+            </Pressable>
           )}
         />
 
@@ -90,19 +121,30 @@ export default function ChatsScreen() {
             visible={modalVisible}
             onDismiss={() => setModalVisible(false)}
             contentContainerStyle={{
-              backgroundColor: "white",
-              padding: 16,
+              backgroundColor: theme.colors.surface,
+              padding: 20,
               borderRadius: 12,
               marginHorizontal: 20,
+              elevation: 4,
             }}
           >
-            <Text style={{ fontSize: 20, marginBottom: 12 }}>Новый чат</Text>
+            <Text
+              variant="titleLarge"
+              style={{
+                marginBottom: 16,
+                color: theme.colors.onSurface,
+                fontWeight: "600",
+              }}
+            >
+              New chat
+            </Text>
 
             <TextInput
               mode="outlined"
-              label="Название"
+              label="Name"
               value={title}
               onChangeText={setTitle}
+              textColor={theme.colors.onSurface}
               style={{ marginBottom: 16 }}
             />
 
@@ -111,7 +153,7 @@ export default function ChatsScreen() {
               onPress={handleCreateChat}
               disabled={!title.trim()}
             >
-              Создать
+              Create
             </Button>
           </Modal>
         </Portal>
